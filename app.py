@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+# from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import *
 from peewee import *
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -21,6 +22,7 @@ class Usuario(BaseModel):
 class Grupo(BaseModel):
     nome = CharField(max_length=100)
     descricao = TextField(null=True)
+    criador = ForeignKeyField(Usuario, backref='grupos', on_delete='CASCADE')
 
 class Tarefa(BaseModel):
     titulo = CharField(max_length=200)
@@ -101,25 +103,119 @@ def dashboard():
 def criar_grupo():
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
+    
+    usuario_id = session['usuario_id']
+    
     if request.method == 'POST':
         nome = request.form['nome']
         descricao = request.form['descricao']
-        Grupo.create(nome=nome, descricao=descricao)
+        
+        Grupo.create(nome=nome, descricao=descricao, criador=usuario_id)
         flash("Grupo criado com sucesso!")
+        return redirect(url_for('ver_grupos'))
+    
     return render_template('criar_grupo.html')
+
+#ver grupo
+@app.route('/grupos')
+def ver_grupos():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    usuario_id = session['usuario_id']
+    grupos = Grupo.select().where(Grupo.criador == usuario_id)
+    return render_template('ver_grupos.html', grupos=grupos)
+
+# Editar grupo
+@app.route('/editar_grupo/<int:grupo_id>', methods=['GET', 'POST'])
+def editar_grupo(grupo_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    grupo = Grupo.get_or_none(Grupo.id == grupo_id)
+    if not grupo or grupo.criador != session['usuario_id']:
+        flash("Acesso negado!")
+        return redirect(url_for('ver_grupos'))
+    
+    if request.method == 'POST':
+        grupo.nome = request.form['nome']
+        grupo.descricao = request.form['descricao']
+        grupo.save()
+        flash("Grupo atualizado com sucesso!")
+        return redirect(url_for('ver_grupos'))
+    
+    return render_template('editar_grupo.html', grupo=grupo)
+
+#apagar grupo
+@app.route('/excluir_grupo/<int:grupo_id>', methods=['POST'])
+def excluir_grupo(grupo_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    grupo = Grupo.get_or_none(Grupo.id == grupo_id)
+    if not grupo or grupo.criador != session['usuario_id']:
+        flash("Acesso negado!")
+        return redirect(url_for('ver_grupos'))
+    
+    grupo.delete_instance()
+    flash("Grupo excluído com sucesso!")
+    return redirect(url_for('ver_grupos'))
 
 # Criar Tarefa
 @app.route('/criar_tarefa', methods=['GET', 'POST'])
 def criar_tarefa():
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
+    
+    usuario_id = session['usuario_id']
+    grupos = Grupo.select().where(Grupo.criador == usuario_id)
+    
     if request.method == 'POST':
         titulo = request.form['titulo']
         descricao = request.form['descricao']
-        usuario = Usuario.get_by_id(session['usuario_id'])
-        Tarefa.create(titulo=titulo, descricao=descricao, usuario=usuario)
+        grupo_id = request.form['grupo'] if request.form['grupo'] else None
+        prazo = request.form['prazo'] if request.form['prazo'] else None
+
+        Tarefa.create(
+            titulo=titulo,
+            descricao=descricao,
+            usuario=usuario_id,
+            grupo=grupo_id,
+            prazo=prazo
+        )
         flash("Tarefa criada com sucesso!")
-    return render_template('criar_tarefa.html')
+        return redirect(url_for('ver_tarefas'))
+    
+    return render_template('criar_tarefa.html', grupos=grupos)
+
+#ver tarefas
+@app.route('/tarefas')
+def ver_tarefas():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    usuario_id = session['usuario_id']
+    tarefas = Tarefa.select().where(Tarefa.usuario == usuario_id)
+    return render_template('ver_tarefas.html', tarefas=tarefas)
+
+
+#excluir tarefa
+@app.route('/excluir_tarefa/<int:tarefa_id>', methods=['POST'])
+def excluir_tarefa(tarefa_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    tarefa = Tarefa.get_or_none(Tarefa.id == tarefa_id)
+    if not tarefa or tarefa.usuario != session['usuario_id']:
+        flash("Acesso negado!")
+        return redirect(url_for('ver_tarefas'))
+    
+    tarefa.delete_instance()
+    flash("Tarefa excluída com sucesso!")
+    return redirect(url_for('ver_tarefas'))
+
+
+
 
 # Logout
 @app.route('/logout')
