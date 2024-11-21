@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Editar Grupo{% endblock %}
+
+{% block content %}
+<h1>Editar Grupo: {{ grupo.nome }}</h1>
+
+<form method="POST" action="{{ url_for('editar_grupo', grupo_id=grupo.id) }}">
+    <div>
+        <label for="nome">Nome do Grupo:</label>
+        <input type="text" id="nome" name="nome" value="{{ grupo.nome }}" required>
+    </div>
+    
+    <div>
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao">{{ grupo.descricao }}</textarea>
+    </div>
+
+    <div>
+        <label for="usuarios">Adicionar/Remover Usuários:</label>
+        <select id="usuarios" name="usuarios" multiple>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}" {% if usuario in grupo.usuarios %}selected{% endif %}>
+                    {{ usuario.nome }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <button type="submit">Salvar Alterações</button>
+        <a href="{{ url_for('ver_grupos') }}">Cancelar</a>
+    </div>
+</form>
+
+<!-- Formulário de Exclusão do Grupo -->
+<form method="POST" action="{{ url_for('excluir_grupo', grupo_id=grupo.id) }}" style="margin-top: 20px;">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir este grupo?');">
+        Excluir Grupo
+    </button>
+</form>
+{% endblock %}

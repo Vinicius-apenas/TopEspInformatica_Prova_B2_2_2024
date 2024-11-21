@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Editar Tarefa{% endblock %}
+
+{% block content %}
+<h1>Editar Tarefa</h1>
+
+<!-- Formulário de Edição -->
+<form method="POST" action="{{ url_for('editar_tarefa', tarefa_id=tarefa.id) }}">
+    <div>
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" value="{{ tarefa.titulo }}" required>
+    </div>
+    
+    <div>
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao">{{ tarefa.descricao }}</textarea>
+    </div>
+    
+    <div>
+        <label for="grupo">Grupo:</label>
+        <select id="grupo" name="grupo">
+            <option value="" {% if not tarefa.grupo %}selected{% endif %}>Sem grupo</option>
+            {% for grupo in grupos %}
+                <option value="{{ grupo.id }}" {% if tarefa.grupo and tarefa.grupo.id == grupo.id %}selected{% endif %}>
+                    {{ grupo.nome }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="prazo">Prazo:</label>
+        <input type="date" id="prazo" name="prazo" value="{{ tarefa.prazo }}">
+    </div>
+    
+    <div>
+        <button type="submit">Salvar Alterações</button>
+        <a href="{{ url_for('ver_tarefas') }}">Cancelar</a>
+    </div>
+</form>
+
+<!-- Formulário de Exclusão -->
+<form method="POST" action="{{ url_for('excluir_tarefa', tarefa_id=tarefa.id) }}" style="margin-top: 20px;">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?');">
+        Excluir Tarefa
+    </button>
+</form>
+{% endblock %}

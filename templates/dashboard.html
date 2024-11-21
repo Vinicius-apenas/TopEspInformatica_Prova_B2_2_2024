@@ -8,14 +8,16 @@
     <p>O que você deseja fazer?</p>
     <ul>
         <li><a href="{{ url_for('criar_grupo') }}">Criar Novo Grupo</a></li>
-        <li><a href="{{ url_for('ver_grupos') }}">Editar Grupos</a></li>
+        <li><a href="{{ url_for('ver_grupos') }}">Ver Grupos</a></li>
         <li><a href="{{ url_for('criar_tarefa') }}">Criar Nova Tarefa</a></li>
-        <li><a href="{{ url_for('ver_tarefas') }}">Editar Tarefas</a></li>
+        <li><a href="{{ url_for('ver_tarefas') }}">Ver Tarefas</a></li>
         <li><a href="{{ url_for('trocar_senha') }}">Trocar Senha</a></li>
         <li><a href="{{ url_for('logout') }}">Sair</a></li>
     </ul>
 </div>
 
+{% endblock %}
+<!-- 
 <div class="tarefas">
     <h2>Suas Tarefas</h2>
     {% if tarefas %}
@@ -35,17 +37,20 @@
 
 <div class="grupos">
     <h2>Seus Grupos</h2>
+
+
     {% if grupos %}
-        <ul>
-            {% for grupo in grupos %}
-                <li>
-                    <strong>{{ grupo.nome }}</strong>
-                    <p>{{ grupo.descricao }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+    <ul>
+        {% for grupo in grupos %}
+            <li>
+                <h3>{{ grupo.nome }}</h3>
+                <p>{{ grupo.descricao }}</p>
+            </li>
+        {% endfor %}
+    </ul>
     {% else %}
-        <p>Você ainda não faz parte de nenhum grupo.</p>
+        <p>Você ainda não pertence a nenhum grupo.</p>
     {% endif %}
-</div>
-{% endblock %}
+
+
+</div> -->

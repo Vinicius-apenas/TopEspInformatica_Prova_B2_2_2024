@@ -1,18 +1,25 @@
 {% extends 'base.html' %}
 {% block title %}Meus Grupos{% endblock %}
+
 {% block content %}
 <h1>Meus Grupos</h1>
-<a href="{{ url_for('criar_grupo') }}">+ Criar Grupo</a>
+<br>
 <p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
-<ul>
-    {% for grupo in grupos %}
-    <li>
-        <strong>{{ grupo.nome }}</strong> - {{ grupo.descricao }}
-        <a href="{{ url_for('editar_grupo', grupo_id=grupo.id) }}">Editar</a>
-        <form method="POST" action="{{ url_for('excluir_grupo', grupo_id=grupo.id) }}" style="display:inline;">
-            <button type="submit">Excluir</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+<hr>
+
+<!-- Verificar se há grupos -->
+{% if grupos %}
+    <ul>
+        {% for grupo in grupos %}
+            <li>
+                <h3>{{ grupo.nome }}</h3>
+                <p>{{ grupo.descricao }}</p>
+                <a href="{{ url_for('editar_grupo', grupo_id=grupo.id) }}">Editar</a>
+                <a href="{{ url_for('ver_tarefas_grupo', grupo_id=grupo.id) }}">Ver Tarefas</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Você ainda não pertence a nenhum grupo.</p>
+{% endif %}
 {% endblock %}
