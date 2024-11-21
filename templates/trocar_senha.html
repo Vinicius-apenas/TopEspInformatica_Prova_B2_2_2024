@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Trocar Senha{% endblock %}
+
+{% block content %}
+<h1>Trocar Senha</h1>
+
+<form method="POST" action="{{ url_for('trocar_senha') }}">
+    <label for="senha_atual">Senha Atual:</label>
+    <input type="password" id="senha_atual" name="senha_atual" placeholder="Digite sua senha atual" required>
+    <br><br>
+
+    <label for="nova_senha">Nova Senha:</label>
+    <input type="password" id="nova_senha" name="nova_senha" placeholder="Digite a nova senha" required>
+    <br><br>
+
+    <label for="confirmar_senha">Confirmar Nova Senha:</label>
+    <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Confirme a nova senha" required>
+    <br><br>
+
+    <button type="submit">Alterar Senha</button>
+</form>
+
+<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Cadastrar Usuário{% endblock %}
+
+{% block content %}
+<div class="container-login">
+    <h1>Cadastrar Novo Usuário</h1>
+    <form method="POST" action="{{ url_for('cadastrar') }}">
+        <label for="nome">Nome:</label><br>
+        <input type="text" id="nome" name="nome" placeholder="Seu nome" required>
+        <br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" placeholder="Seu email" required>
+        <br>
+
+        <label for="senha">Senha:</label><br>
+        <input type="password" id="senha" name="senha" placeholder="Escolha uma senha" required>
+        <br><br>
+
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+    </form>
+    <hr>
+    <p>Já tem uma conta? <a href="{{ url_for('login') }}">Faça login aqui</a>.</p>
+</div>
+{% endblock %}

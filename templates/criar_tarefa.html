@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Criar Tarefa{% endblock %}
+
+{% block content %}
+<h1>Criar Nova Tarefa</h1>
+
+<form method="POST" action="{{ url_for('criar_tarefa') }}">
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" name="titulo" placeholder="Digite o título da tarefa" required>
+    <br><br>
+
+    <label for="descricao">Descrição:</label>
+    <textarea id="descricao" name="descricao" placeholder="Digite a descrição da tarefa" rows="4" cols="50"></textarea>
+    <br><br>
+
+    <label for="grupo">Selecionar Grupo (opcional):</label>
+    <select id="grupo" name="grupo">
+        <option value="">Nenhum grupo</option>
+        {% for grupo in grupos %}
+            <option value="{{ grupo.id }}">{{ grupo.nome }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="prazo">Prazo (opcional):</label>
+    <input type="date" id="prazo" name="prazo">
+    <br><br>
+
+    <button type="submit">Criar Tarefa</button>
+</form>
+
+<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
+{% endblock %}
