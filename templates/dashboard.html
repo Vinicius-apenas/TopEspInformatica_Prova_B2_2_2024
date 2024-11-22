@@ -6,51 +6,15 @@
 
 <div class="dashboard-links">
     <p>O que você deseja fazer?</p>
-    <ul>
-        <li><a href="{{ url_for('criar_grupo') }}">Criar Novo Grupo</a></li>
-        <li><a href="{{ url_for('ver_grupos') }}">Ver Grupos</a></li>
-        <li><a href="{{ url_for('criar_tarefa') }}">Criar Nova Tarefa</a></li>
-        <li><a href="{{ url_for('ver_tarefas') }}">Ver Tarefas</a></li>
-        <li><a href="{{ url_for('trocar_senha') }}">Trocar Senha</a></li>
-        <li><a href="{{ url_for('logout') }}">Sair</a></li>
-    </ul>
+
+        <a href="{{ url_for('criar_grupo') }}" class="btn btn-secondary">Criar Novo Grupo</a><br><br>
+        <a href="{{ url_for('ver_grupos') }}" class="btn btn-secondary">Ver Grupos</a><hr>
+        <a href="{{ url_for('criar_tarefa') }}" class="btn btn-secondary">Criar Nova Tarefa</a><br><br>
+        <a href="{{ url_for('ver_tarefas') }}" class="btn btn-secondary">Ver Tarefas</a><hr>
+        <a href="{{ url_for('trocar_senha') }}" class="btn btn-secondary">Trocar Senha</a>
+        <a href="{{ url_for('sobre') }}" class="btn btn-secondary">Sobre</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">Sair</a>
+    
 </div>
 
 {% endblock %}
-<!-- 
-<div class="tarefas">
-    <h2>Suas Tarefas</h2>
-    {% if tarefas %}
-        <ul>
-            {% for tarefa in tarefas %}
-                <li>
-                    <strong>{{ tarefa.titulo }}</strong>
-                    <p>{{ tarefa.descricao }}</p>
-                    <p>Status: {{ "Concluída" if tarefa.concluida else "Pendente" }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Você ainda não criou nenhuma tarefa.</p>
-    {% endif %}
-</div>
-
-<div class="grupos">
-    <h2>Seus Grupos</h2>
-
-
-    {% if grupos %}
-    <ul>
-        {% for grupo in grupos %}
-            <li>
-                <h3>{{ grupo.nome }}</h3>
-                <p>{{ grupo.descricao }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>Você ainda não pertence a nenhum grupo.</p>
-    {% endif %}
-
-
-</div> -->

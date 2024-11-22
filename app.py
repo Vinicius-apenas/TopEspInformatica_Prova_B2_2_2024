@@ -35,6 +35,7 @@ class Tarefa(BaseModel):
     concluida = BooleanField(default=False)
     usuario = ForeignKeyField(Usuario, backref='tarefas', on_delete='CASCADE')
     grupo = ForeignKeyField(Grupo, backref='tarefas', null=True, on_delete='SET NULL')
+    criador = ForeignKeyField(Usuario, backref='tarefas_criadas', on_delete='CASCADE')
 
 # Inicialização do banco
 def criar_tabelas():
@@ -152,23 +153,22 @@ def ver_tarefas_grupo(grupo_id):
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
     
-    # Obter o grupo pelo ID
+    # Obter o grupo
     grupo = Grupo.get_or_none(Grupo.id == grupo_id)
     if not grupo:
         flash("Grupo não encontrado.")
         return redirect(url_for('ver_grupos'))
     
-    # Verificar se o usuário está associado ao grupo
+    # Verificar se o usuário faz parte do grupo
     usuario = Usuario.get_or_none(Usuario.id == session['usuario_id'])
     if not GrupoUsuario.get_or_none(grupo=grupo, usuario=usuario):
         flash("Você não tem permissão para acessar este grupo.")
         return redirect(url_for('ver_grupos'))
     
-    # Obter as tarefas associadas ao grupo
-    tarefas = Tarefa.select().where(Tarefa.grupo == grupo)
+    # Buscar tarefas do grupo com os relacionamentos carregados
+    tarefas = Tarefa.select(Tarefa, Usuario).where(Tarefa.grupo == grupo).join(Usuario, on=(Tarefa.criador == Usuario.id))
     
     return render_template('ver_tarefas_grupo.html', grupo=grupo, tarefas=tarefas)
-
 
 # Editar grupo
 @app.route('/editar_grupo/<int:grupo_id>', methods=['GET', 'POST'])
@@ -243,18 +243,27 @@ def criar_tarefa():
         descricao = request.form['descricao']
         grupo_id = request.form['grupo'] if request.form['grupo'] else None
         prazo = request.form['prazo'] if request.form['prazo'] else None
-
+        criador= usuario_id
+        
         Tarefa.create(
             titulo=titulo,
             descricao=descricao,
             usuario=usuario_id,
             grupo=grupo_id,
-            prazo=prazo
+            prazo=prazo,
+            criador=criador
         )
         flash("Tarefa criada com sucesso!")
         return redirect(url_for('ver_tarefas'))
     
     return render_template('criar_tarefa.html', grupos=grupos)
+
+
+@app.route('/sobre')
+def sobre():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('sobre.html')
 
 #ver tarefas
 @app.route('/tarefas')
