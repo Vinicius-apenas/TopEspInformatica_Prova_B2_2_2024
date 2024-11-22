@@ -6,20 +6,20 @@
 
 <form method="POST" action="{{ url_for('editar_grupo', grupo_id=grupo.id) }}">
     <div>
-        <label for="nome">Nome do Grupo:</label>
+        <label for="nome">Nome do Grupo:</label><br>
         <input type="text" id="nome" name="nome" value="{{ grupo.nome }}" required>
     </div>
-    
+    <br>
     <div>
-        <label for="descricao">Descrição:</label>
+        <label for="descricao">Descrição:</label><br>
         <textarea id="descricao" name="descricao">{{ grupo.descricao }}</textarea>
     </div>
-    
+    <br>
     <div>
-        <label for="emails">Adicionar Usuários por E-mail:</label>
+        <label for="emails">Adicionar Usuários por E-mail:</label><br>
         <input type="text" id="emails" name="emails" placeholder="Digite e-mails separados por vírgula">
     </div>
-    
+    <br>
     <div>
         <p>Usuários no grupo:</p>
         <ul>
@@ -30,8 +30,16 @@
     </div>
     
     <div>
-        <button type="submit">Salvar Alterações</button>
-        <a href="{{ url_for('ver_grupos') }}">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{{ url_for('ver_grupos') }}" class="btn btn-warning">Cancelar</a>
     </div>
+
 </form>
+<hr>
+<form method="POST" action="{{ url_for('excluir_grupo', grupo_id=grupo.id) }}">
+    <button type="submit" class="btn btn-danger"
+            onclick="return confirm('Tem certeza que deseja excluir este grupo? Esta ação não pode ser desfeita.')">
+        Excluir Grupo
+    </button>
+</form> 
 {% endblock %}

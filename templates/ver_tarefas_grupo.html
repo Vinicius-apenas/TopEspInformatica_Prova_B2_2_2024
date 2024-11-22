@@ -2,11 +2,13 @@
 {% block title %}Tarefas do Grupo: {{ grupo.nome }}{% endblock %}
 
 {% block content %}
+<a href="{{ url_for('ver_grupos') }}" class="btn btn-danger">Voltar aos Grupos</a><hr>
 <h1>Tarefas do Grupo: {{ grupo.nome }}</h1>
 
 <p>{{ grupo.descricao }}</p>
 
-<a href="{{ url_for('ver_grupos') }}">Voltar aos Grupos</a>
+
+<hr>
 {% if tarefas %}
     <ul>
         {% for tarefa in tarefas %}
@@ -15,6 +17,7 @@
                 <br>
                 Criada por: {{ tarefa.criador.nome }}
             </li>
+            <hr>
         {% endfor %}
     </ul>
 {% else %}

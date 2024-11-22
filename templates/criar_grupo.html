@@ -2,19 +2,20 @@
 {% block title %}Criar Grupo{% endblock %}
 
 {% block content %}
+<p><a href="{{ url_for('dashboard') }}" class="btn btn-danger">Voltar ao Dashboard</a></p><hr>
 <h1>Criar Novo Grupo</h1>
 
 <form method="POST" action="{{ url_for('criar_grupo') }}">
-    <label for="nome">Nome do Grupo:</label>
+    <label for="nome">Nome do Grupo:</label><br>
     <input type="text" id="nome" name="nome" placeholder="Digite o nome do grupo" required>
     <br><br>
 
-    <label for="descricao">Descrição:</label>
+    <label for="descricao">Descrição:</label><br>
     <textarea id="descricao" name="descricao" placeholder="Digite uma breve descrição do grupo" rows="4" cols="50"></textarea>
     <br><br>
-
-    <button type="submit">Criar Grupo</button>
+    <button type="submit" class="btn btn-primary">Criar</button>
+    
 </form>
+<br>
 
-<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
 {% endblock %}

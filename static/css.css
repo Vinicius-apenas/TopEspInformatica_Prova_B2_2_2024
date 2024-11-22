@@ -1,13 +1,14 @@
 
-.container-login body {
+body {
+    padding-top: 80px;
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
     display: flex;
     justify-content: center;
-    align-items: center;
     height: 100vh;
     margin: 0;
 }
+
 
 .container-login {
     background: white;

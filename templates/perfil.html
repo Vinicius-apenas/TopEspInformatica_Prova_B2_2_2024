@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Voltar ao Dashboard</a><hr>
+
+<h1>Perfil</h1>
+
+<p>Nome: {{ usuario.nome }}</p>
+<p>Email: {{ usuario.email }}</p>
+
+<hr>
+<a href="{{ url_for('trocar_senha') }}" class="btn btn-secondary">Trocar Senha</a><br><br>
+
+<form method="POST" action="{{ url_for('excluir_conta') }}">
+    <button type="submit" class="btn btn-danger" 
+            onclick="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')">
+        Excluir Conta
+    </button>
+</form>
+
+{%endblock%}

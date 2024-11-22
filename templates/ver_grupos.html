@@ -2,10 +2,11 @@
 {% block title %}Meus Grupos{% endblock %}
 
 {% block content %}
+<p><a href="{{ url_for('dashboard') }}" class="btn btn-danger">Voltar ao Dashboard</a></p>
+<hr>
 <h1>Meus Grupos</h1>
 <br>
-<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
-<hr>
+
 
 <!-- Verificar se há grupos -->
 {% if grupos %}
@@ -14,9 +15,10 @@
             <li>
                 <h3>{{ grupo.nome }}</h3>
                 <p>{{ grupo.descricao }}</p>
-                <a href="{{ url_for('editar_grupo', grupo_id=grupo.id) }}">Editar</a>
-                <a href="{{ url_for('ver_tarefas_grupo', grupo_id=grupo.id) }}">Ver Tarefas</a>
+                <a href="{{ url_for('editar_grupo', grupo_id=grupo.id) }}" class="btn btn-secondary">Editar</a>
+                <a href="{{ url_for('ver_tarefas_grupo', grupo_id=grupo.id) }}" class="btn btn-info">Ver Tarefas</a>
             </li>
+            <hr>
         {% endfor %}
     </ul>
 {% else %}

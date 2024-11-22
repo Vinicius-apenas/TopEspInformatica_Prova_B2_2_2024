@@ -1,6 +1,9 @@
 # from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask import *
 from peewee import *
+import json
+import os
+import zipfile
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -30,12 +33,11 @@ class GrupoUsuario(BaseModel):
 
 
 class Tarefa(BaseModel):
-    titulo = CharField(max_length=200)
+    titulo = CharField()
     descricao = TextField(null=True)
-    concluida = BooleanField(default=False)
-    usuario = ForeignKeyField(Usuario, backref='tarefas', on_delete='CASCADE')
+    criador = ForeignKeyField(Usuario, backref='tarefas_criadas', on_delete='SET NULL')
     grupo = ForeignKeyField(Grupo, backref='tarefas', null=True, on_delete='SET NULL')
-    criador = ForeignKeyField(Usuario, backref='tarefas_criadas', on_delete='CASCADE')
+
 
 # Inicialização do banco
 def criar_tabelas():
@@ -79,6 +81,36 @@ def cadastrar():
         except IntegrityError:
             flash("Erro: Email já cadastrado.")
     return render_template('cadastrar.html')
+
+#deletar usuario
+@app.route('/excluir_conta', methods=['POST'])
+def excluir_conta():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    usuario = Usuario.get_or_none(Usuario.id == session['usuario_id'])
+    if not usuario:
+        flash("Usuário não encontrado.")
+        return redirect(url_for('dashboard'))
+    
+
+    usuario.delete_instance(recursive=True)
+    session.clear()
+    flash("Sua conta foi excluída com sucesso.")
+    return redirect(url_for('login'))
+
+@app.route('/perfil')
+def perfil():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    
+    usuario = Usuario.get_or_none(Usuario.id == session['usuario_id'])
+    if not usuario:
+        flash("Usuário não encontrado.")
+        return redirect(url_for('dashboard'))
+    
+    return render_template('perfil.html', usuario=usuario)
+
 
 # Trocar Senha
 @app.route('/trocar_senha', methods=['GET', 'POST'])
@@ -216,16 +248,19 @@ def excluir_grupo(grupo_id):
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
     
+    # Recupera o grupo
     grupo = Grupo.get_or_none(Grupo.id == grupo_id)
     if not grupo:
         flash("Grupo não encontrado.")
         return redirect(url_for('ver_grupos'))
     
-    if grupo.criador.id != session['usuario_id']:  # Verificar se o usuário é o criador do grupo
+    # Verifica se o usuário é o criador
+    if grupo.criador.id != session['usuario_id']:
         flash("Você não tem permissão para excluir este grupo.")
         return redirect(url_for('ver_grupos'))
     
-    grupo.delete_instance()  # Excluir o grupo
+    # Exclui o grupo e suas tarefas associadas
+    grupo.delete_instance(recursive=True)  # `recursive=True` remove as dependências (tarefas)
     flash("Grupo excluído com sucesso!")
     return redirect(url_for('ver_grupos'))
 
@@ -242,7 +277,6 @@ def criar_tarefa():
         titulo = request.form['titulo']
         descricao = request.form['descricao']
         grupo_id = request.form['grupo'] if request.form['grupo'] else None
-        prazo = request.form['prazo'] if request.form['prazo'] else None
         criador= usuario_id
         
         Tarefa.create(
@@ -250,7 +284,6 @@ def criar_tarefa():
             descricao=descricao,
             usuario=usuario_id,
             grupo=grupo_id,
-            prazo=prazo,
             criador=criador
         )
         flash("Tarefa criada com sucesso!")
@@ -272,7 +305,7 @@ def ver_tarefas():
         return redirect(url_for('login'))
     
     usuario_id = session['usuario_id']
-    tarefas = Tarefa.select().where(Tarefa.usuario == usuario_id)
+    tarefas = Tarefa.select().where(Tarefa.criador == usuario_id)
     return render_template('ver_tarefas.html', tarefas=tarefas)
 
 
@@ -283,8 +316,12 @@ def excluir_tarefa(tarefa_id):
         return redirect(url_for('login'))
     
     tarefa = Tarefa.get_or_none(Tarefa.id == tarefa_id)
-    if not tarefa or tarefa.usuario.id != session['usuario_id']:
-        flash("Acesso negado!")
+    if not tarefa:
+        flash("Tarefa não encontrada.")
+        return redirect(url_for('ver_tarefas'))
+    
+    if tarefa.criador.id != session['usuario_id']:
+        flash("Você não tem permissão para excluir esta tarefa.")
         return redirect(url_for('ver_tarefas'))
     
     tarefa.delete_instance()
@@ -298,24 +335,29 @@ def editar_tarefa(tarefa_id):
         return redirect(url_for('login'))
     
     tarefa = Tarefa.get_or_none(Tarefa.id == tarefa_id)
-    if not tarefa or tarefa.usuario.id != session['usuario_id']:
-        flash("Acesso negado!")
+    if not tarefa:
+        flash("Tarefa não encontrada.")
         return redirect(url_for('ver_tarefas'))
     
-    grupos = Grupo.select().where(Grupo.criador == session['usuario_id'])
+    # Verifica se o usuário logado é o criador da tarefa
+    if tarefa.criador.id != session['usuario_id']:
+        flash("Você não tem permissão para editar esta tarefa.")
+        return redirect(url_for('ver_tarefas'))
     
     if request.method == 'POST':
-        tarefa.titulo = request.form['titulo']
-        tarefa.descricao = request.form['descricao']
-        grupo_id = request.form['grupo']
-        tarefa.grupo = Grupo.get_by_id(grupo_id) if grupo_id else None
-        tarefa.prazo = request.form['prazo'] if request.form['prazo'] else None
+        titulo = request.form['titulo']
+        descricao = request.form['descricao']
+        
+        tarefa.titulo = titulo
+        tarefa.descricao = descricao
+
         tarefa.save()
         
         flash("Tarefa atualizada com sucesso!")
         return redirect(url_for('ver_tarefas'))
     
-    return render_template('editar_tarefa.html', tarefa=tarefa, grupos=grupos)
+    return render_template('editar_tarefa.html', tarefa=tarefa)
+
 
 
 # Logout
@@ -323,6 +365,42 @@ def editar_tarefa(tarefa_id):
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+
+
+@app.route('/baixar_tarefas', methods=['GET'])
+def baixar_tarefas():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+    usuario_id = session['usuario_id']
+    tarefas = Tarefa.select().where(Tarefa.criador_id == usuario_id)
+
+    tarefas_lista = [
+        {
+            "id": tarefa.id,
+            "titulo": tarefa.titulo,
+            "descricao": tarefa.descricao,
+            "grupo": tarefa.grupo.nome if tarefa.grupo else None,
+
+        }
+        for tarefa in tarefas
+    ]
+    json_data = json.dumps(tarefas_lista, indent=4)
+
+    json_path = "tarefas.json"
+    zip_path = "tarefas.zip"
+
+    with open(json_path, 'w') as json_file:
+        json_file.write(json_data)
+
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        zip_file.write(json_path, arcname='tarefas.json')
+
+    os.remove(json_path)
+
+    return send_file(zip_path, as_attachment=True, download_name='tarefas.zip')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

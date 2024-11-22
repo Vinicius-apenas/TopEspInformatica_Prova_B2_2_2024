@@ -3,18 +3,21 @@
 {% block title %}Minhas Tarefas{% endblock %}
 
 {% block content %}
+<p><a href="{{ url_for('dashboard') }}" class="btn btn-danger">Voltar ao Dashboard</a></p>
+<hr>
 <h1>Minhas Tarefas</h1>
-<a href="{{ url_for('criar_tarefa') }}">+ Criar Tarefa</a>
-<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
+<a href="{{ url_for('criar_tarefa') }}" class="btn btn-warning">Criar +1 Tarefa</a>
+<a href="{{ url_for('baixar_tarefas') }}" class="btn btn-primary">Baixar Tarefas</a>
 <hr>
 <ul>
+    
     {% for tarefa in tarefas %}
     <li>
         <strong>{{ tarefa.titulo }}</strong>
         <p>Descrição: {{ tarefa.descricao or "Sem descrição" }}</p>
         <p>Prazo: {{ tarefa.prazo or "Sem prazo" }}</p>
         <p>Grupo: {{ tarefa.grupo.nome if tarefa.grupo else "Sem grupo" }}</p>
-        <a href="{{ url_for('editar_tarefa', tarefa_id=tarefa.id) }}">Editar</a>
+        <a href="{{ url_for('editar_tarefa', tarefa_id=tarefa.id) }}" class="btn btn-secondary">Editar</a>
         <!-- <form method="POST" action="{{ url_for('excluir_tarefa', tarefa_id=tarefa.id) }}" style="display:inline;">
             <button type="submit" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?');">Excluir</button>
         </form> -->

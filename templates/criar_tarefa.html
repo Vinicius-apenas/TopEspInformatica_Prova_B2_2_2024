@@ -2,14 +2,16 @@
 {% block title %}Criar Tarefa{% endblock %}
 
 {% block content %}
+<p><a href="{{ url_for('dashboard') }}" class="btn btn-danger">Voltar ao Dashboard</a></p>
+<hr>
 <h1>Criar Nova Tarefa</h1>
 
 <form method="POST" action="{{ url_for('criar_tarefa') }}">
-    <label for="titulo">Título:</label>
+    <label for="titulo">Título:</label><br>
     <input type="text" id="titulo" name="titulo" placeholder="Digite o título da tarefa" required>
     <br><br>
 
-    <label for="descricao">Descrição:</label>
+    <label for="descricao">Descrição:</label><br>
     <textarea id="descricao" name="descricao" placeholder="Digite a descrição da tarefa" rows="4" cols="50"></textarea>
     <br><br>
 
@@ -22,12 +24,10 @@
     </select>
     <br><br>
 
-    <label for="prazo">Prazo (opcional):</label>
-    <input type="date" id="prazo" name="prazo">
-    <br><br>
+    <!-- <label for="prazo">Prazo (opcional):</label>
+    <input type="date" id="prazo" name="prazo"> -->
 
-    <button type="submit">Criar Tarefa</button>
+    <button type="submit" class="btn btn-primary">Criar Tarefa</button>
 </form>
 
-<p><a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a></p>
 {% endblock %}
