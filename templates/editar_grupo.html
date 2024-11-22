@@ -14,28 +14,24 @@
         <label for="descricao">Descrição:</label>
         <textarea id="descricao" name="descricao">{{ grupo.descricao }}</textarea>
     </div>
-
+    
     <div>
-        <label for="usuarios">Adicionar/Remover Usuários:</label>
-        <select id="usuarios" name="usuarios" multiple>
-            {% for usuario in usuarios %}
-                <option value="{{ usuario.id }}" {% if usuario in grupo.usuarios %}selected{% endif %}>
-                    {{ usuario.nome }}
-                </option>
+        <label for="emails">Adicionar Usuários por E-mail:</label>
+        <input type="text" id="emails" name="emails" placeholder="Digite e-mails separados por vírgula">
+    </div>
+    
+    <div>
+        <p>Usuários no grupo:</p>
+        <ul>
+            {% for email in usuarios_no_grupo %}
+                <li>{{ email }}</li>
             {% endfor %}
-        </select>
+        </ul>
     </div>
     
     <div>
         <button type="submit">Salvar Alterações</button>
         <a href="{{ url_for('ver_grupos') }}">Cancelar</a>
     </div>
-</form>
-
-<!-- Formulário de Exclusão do Grupo -->
-<form method="POST" action="{{ url_for('excluir_grupo', grupo_id=grupo.id) }}" style="margin-top: 20px;">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir este grupo?');">
-        Excluir Grupo
-    </button>
 </form>
 {% endblock %}
